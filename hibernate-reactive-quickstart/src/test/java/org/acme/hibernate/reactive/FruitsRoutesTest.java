@@ -10,14 +10,15 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.text.IsEmptyString.emptyString;
 
 @QuarkusTest
-public class FruitsEndpointTest {
+public class FruitsRoutesTest {
 
     @Test
     public void testListAllFruits() {
+        System.out.println("TESTLISTALLFRUITS");
         //List all, should have all 3 fruits the database has initially:
         given()
 			.when()
-				.get("/app/fruits")
+				.get("/ovoce/")
 			.then()
 				.statusCode(200)
 				.body(
@@ -30,7 +31,7 @@ public class FruitsEndpointTest {
 			.when()
 				.body("{\"name\" : \"Pineapple\"}")
 				.contentType("application/json")
-				.put("/app/fruits/1")
+				.put("/ovoce/1")
 			.then()
 				.statusCode(200)
 				.body(
@@ -40,7 +41,7 @@ public class FruitsEndpointTest {
         //List all, Pineapple should've replaced Cherry:
         given()
 			.when()
-				.get("/app/fruits")
+				.get("/ovoce/")
 			.then()
 				.statusCode(200)
 				.body(
@@ -52,14 +53,14 @@ public class FruitsEndpointTest {
         //Delete Pineapple:
         given()
 			.when()
-				.delete("/app/fruits/1")
+				.delete("/ovoce/1")
 			.then()
 				.statusCode(204);
 
         //List all, Pineapple should be missing now:
         given()
 			.when()
-				.get("/app/fruits")
+				.get("/ovoce/")
 			.then()
                 .statusCode(200)
                 .body(
@@ -72,7 +73,7 @@ public class FruitsEndpointTest {
 			.when()
 				.body("{\"name\" : \"Pear\"}")
 				.contentType("application/json")
-				.post("/app/fruits")
+				.post("/ovoce/")
 			.then()
 				.statusCode(201)
 				.body(
@@ -82,7 +83,7 @@ public class FruitsEndpointTest {
         //List all, Pineapple should be still missing now:
         given()
 			.when()
-				.get("/app/fruits")
+				.get("/ovoce/")
 			.then()
 				.statusCode(200)
 				.body(
@@ -94,9 +95,10 @@ public class FruitsEndpointTest {
 
     @Test
     public void testEntityNotFoundForDelete() {
+        System.out.println("TESTENTITYNOTFOUNDFORDELETE");
         given()
 			.when()
-				.delete("/app/fruits/9236")
+				.delete("/ovoce/9236")
 			.then()
 				.statusCode(404)
 				.body(emptyString());
@@ -104,11 +106,12 @@ public class FruitsEndpointTest {
 
     @Test
     public void testEntityNotFoundForUpdate() {
+        System.out.println("TESTENTITYNOTFOUNDFORUPDATE");
         given()
 			.when()
 				.body("{\"name\" : \"Watermelon\"}")
 				.contentType("application/json")
-				.put("/app/fruits/32432")
+				.put("/ovoce/32432")
 			.then()
 				.statusCode(404)
 				.body(emptyString());
@@ -116,16 +119,17 @@ public class FruitsEndpointTest {
 
 	@Test
 	public void testMissingNameForUpdate() {
+	    System.out.println("TESTMISSINGNAMEFORUPDATE");
 		given()
 			.when()
 				.contentType("application/json")
-				.put("/app/fruits/3")
+				.put("/ovoce/3")
 			.then()
 				.statusCode(422)
 				.body(
 					containsString("\"code\":422"),
 					containsString("\"error\":\"Fruit name was not set on request.\""),
-					containsString("\"exceptionType\":\"javax.ws.rs.WebApplicationException\"")
+					containsString("\"exceptionType\":\"java.lang.IllegalArgumentException\"")
 				);
 	}
 }
