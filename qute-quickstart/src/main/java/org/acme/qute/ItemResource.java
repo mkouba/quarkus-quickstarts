@@ -4,22 +4,25 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateExtension;
 import io.quarkus.qute.TemplateInstance;
+import io.quarkus.qute.api.CheckedTemplate;
 
 @Path("items")
 public class ItemResource {
 
-    @Inject
-    Template items;
-
+    @CheckedTemplate
+    static class Templates {
+        
+        static native TemplateInstance items(List<Item> items);
+        
+    }
+    
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance get() {
@@ -27,7 +30,7 @@ public class ItemResource {
         data.add(new Item(new BigDecimal(10), "Apple"));
         data.add(new Item(new BigDecimal(16), "Pear"));
         data.add(new Item(new BigDecimal(30), "Orange"));
-        return items.data("items", data);
+        return Templates.items(data);
     }
 
     /**
