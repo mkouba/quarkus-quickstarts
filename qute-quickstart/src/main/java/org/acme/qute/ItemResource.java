@@ -33,12 +33,10 @@ public class ItemResource {
         return Templates.items(data);
     }
 
-    /**
-     * This template extension method implements the "discountedPrice" computed property.
-     */
     @TemplateExtension
-    static BigDecimal discountedPrice(Item item) {
-        return item.price.multiply(new BigDecimal("0.9"));
+    static BigDecimal discountedPrice(Item item, int discount) {
+        BigDecimal sub = item.price.divide(new BigDecimal(100)).multiply(new BigDecimal(discount));
+        return item.price.subtract(sub);
     }
 
 }

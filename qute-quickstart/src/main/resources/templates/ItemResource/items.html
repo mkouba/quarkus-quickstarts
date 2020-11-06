@@ -5,10 +5,10 @@
         {#for item in items}
         <li>
             {item.name}:
-            {#if item.price < 15}
+            {#if item.price < 15 || item.price > 20}
               {item.price}
             {#else}
-              <del>{item.price}</del> <strong>{item.discountedPrice}</strong>
+              <del>{item.price}</del> <strong>{item.discountedPrice(50)}</strong>
             {/if}
         </li>
         {/for}
