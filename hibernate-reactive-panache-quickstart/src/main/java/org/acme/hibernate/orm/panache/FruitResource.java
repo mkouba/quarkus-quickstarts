@@ -27,9 +27,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.quarkus.hibernate.reactive.panache.Panache;
+import io.quarkus.panache.common.Parameters;
 import io.quarkus.panache.common.Sort;
+import io.quarkus.runtime.util.ExceptionUtil;
 import io.smallrye.mutiny.CompositeException;
 import io.smallrye.mutiny.Uni;
+import io.vertx.core.json.JsonObject;
 
 @Path("fruits")
 @ApplicationScoped
@@ -57,7 +60,7 @@ public class FruitResource {
         }
 
         return Panache.withTransaction(fruit::persist)
-                    .replaceWith(Response.ok(fruit).status(CREATED)::build);
+                .replaceWith(Response.ok(fruit).status(CREATED)::build);
     }
 
     @PUT
@@ -69,10 +72,25 @@ public class FruitResource {
 
         return Panache
                 .withTransaction(() -> Fruit.<Fruit> findById(id)
-                    .onItem().ifNotNull().invoke(entity -> entity.name = fruit.name)
-                )
+                        .onItem().ifNotNull().invoke(entity -> entity.name = fruit.name))
                 .onItem().ifNotNull().transform(entity -> Response.ok(entity).build())
-                .onItem().ifNull().continueWith(Response.ok().status(NOT_FOUND)::build);
+                .onItem().ifNull().continueWith(Response.ok().status(NOT_FOUND)::build)
+                .onFailure().recoverWithUni(t -> failureToResponse(t, id, fruit));
+    }
+
+    private Uni<Response> failureToResponse(Throwable t, Long id, Fruit fruit) {
+        Throwable cause = ExceptionUtil.getRootCause(t);
+        if (cause.getMessage().contains("duplicate key value violates unique constraint")) {
+            return Fruit.<Fruit> find("select distinct f from Fruit f where f.id = :id", Parameters.with("id", id))
+                    .singleResult().map(fru -> {
+                        return Response
+                                .serverError().entity(new JsonObject().put("message", "Unable to update fruit " + fru
+                                        + " with name " + fruit.name + " - a fruit with this name already exists").toString())
+                                .build();
+                    });
+        } else {
+            return Uni.createFrom().item(Response.serverError().entity(cause.getMessage()).build());
+        }
     }
 
     @DELETE
