@@ -5,6 +5,8 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -40,8 +42,14 @@ public class FruitResource {
     private static final Logger LOGGER = Logger.getLogger(FruitResource.class.getName());
 
     @GET
-    public Uni<List<Fruit>> get() {
-        return Fruit.listAll(Sort.by("name"));
+    public Uni<Long> get() {
+        Uni<List<Fruit>> all = Fruit.listAll(Sort.by("name"));
+        Uni<Long> count = Fruit.count();
+
+        CompletableFuture.allOf(all.subscribeAsCompletionStage().toCompletableFuture(),
+                count.subscribeAsCompletionStage().toCompletableFuture());
+
+        return Uni.createFrom().item(42l);
     }
 
     @GET
@@ -57,7 +65,7 @@ public class FruitResource {
         }
 
         return Panache.withTransaction(fruit::persist)
-                    .replaceWith(Response.ok(fruit).status(CREATED)::build);
+                .replaceWith(Response.ok(fruit).status(CREATED)::build);
     }
 
     @PUT
@@ -69,8 +77,7 @@ public class FruitResource {
 
         return Panache
                 .withTransaction(() -> Fruit.<Fruit> findById(id)
-                    .onItem().ifNotNull().invoke(entity -> entity.name = fruit.name)
-                )
+                        .onItem().ifNotNull().invoke(entity -> entity.name = fruit.name))
                 .onItem().ifNotNull().transform(entity -> Response.ok(entity).build())
                 .onItem().ifNull().continueWith(Response.ok().status(NOT_FOUND)::build);
     }
