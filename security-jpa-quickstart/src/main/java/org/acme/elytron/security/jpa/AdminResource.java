@@ -6,9 +6,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import io.smallrye.common.annotation.NonBlocking;
+
 @Path("/api/admin")
 public class AdminResource {
 
+    @NonBlocking
     @GET
     @RolesAllowed("admin")
     @Produces(MediaType.TEXT_PLAIN)
