@@ -30,6 +30,7 @@ import io.quarkus.panache.common.Sort;
 import io.smallrye.mutiny.CompositeException;
 import io.smallrye.mutiny.Uni;
 
+@LogStart
 @Path("fruits")
 @ApplicationScoped
 @Produces("application/json")
@@ -56,20 +57,31 @@ public class FruitResource {
         }
 
         return Panache.withTransaction(fruit::persist)
-                    .replaceWith(Response.ok(fruit).status(CREATED)::build);
+                .replaceWith(Response.ok(fruit).status(CREATED)::build);
     }
+    
+    @Inject
+    FruitUpdater updater;
 
+    // NOTE: this resource method results in ~ 45 request context activations (!)
     @PUT
     @Path("{id}")
     public Uni<Response> update(Long id, Fruit fruit) {
+        
         if (fruit == null || fruit.name == null) {
             throw new WebApplicationException("Fruit name was not set on request.", 422);
         }
+        
+        // (A) this initializes a new bean instance and set the state 
+        updater.setConsumer((e,f) -> e.name = f.name.toUpperCase());
 
         return Panache
                 .withTransaction(() -> Fruit.<Fruit> findById(id)
-                    .onItem().ifNotNull().invoke(entity -> entity.name = fruit.name)
-                )
+                        .onItem().ifNotNull().invoke(entity -> {
+                            // (B) the request context must be active and we must use the same bean instance as in (A)
+                            // ==> CP is required
+                            updater.update(entity, fruit);
+                        }))
                 .onItem().ifNotNull().transform(entity -> Response.ok(entity).build())
                 .onItem().ifNull().continueWith(Response.ok().status(NOT_FOUND)::build);
     }
