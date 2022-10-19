@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 
 public class Item {
 
-    public final BigDecimal price;
-    public final String name;
+    public BigDecimal price;
+    public String name;
 
     public Item(BigDecimal price, String name) {
         this.price = price;

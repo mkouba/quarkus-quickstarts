@@ -10,13 +10,27 @@
         {#for item in items}
         <li>
             {item.name}:
-            {#if item.price < 15}
+            
+            {#fragment id=price}
+            <div hx-target="this" hx-swap="outerHTML">
+              {#if item.price < 15}
               {item.price}
-            {#else}
+              {#else}
               <del>{item.price}</del> <strong>{item.discountedPrice}</strong>
-            {/if}
+              {/if}
+              <button hx-get="/items/{item.name}/priceEdit">Edit</button>
+            </div>
+            {/fragment}
+            {#fragment id=priceEdit rendered=false}
+            <form hx-put="/items/{item.name}/price">
+               <input type="text" name="price" value="{item.price}">
+               <button type="submit">Save</button>
+            </form>
+            {/fragment}
         </li>
         {/for}
     </ul>
+    
+    <script src="/js/htmx.min.js"></script>
 </body>
 </html>

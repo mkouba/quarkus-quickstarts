@@ -14,6 +14,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
+    <webjar.htmx.version>1.8.0</webjar.htmx.version>
   </properties>
 
   <dependencyManagement>
@@ -32,6 +33,11 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy-reactive-qute</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>htmx.org</artifactId>
+      <version>${webjar.htmx.version}</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -75,6 +81,38 @@
           </execution>
         </executions>
       </plugin>
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-dependency-plugin</artifactId>
+         <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>install-web-resources</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <!-- htmx -->
+                                <artifactItem>
+                                    <groupId>org.webjars.npm</groupId>
+                                    <artifactId>htmx.org</artifactId>
+                                    <version>${webjar.htmx.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/classes/META-INF/resources/js/</outputDirectory>
+                                    <includes>**/htmx.min.js</includes>
+                                    <fileMappers>
+                                         <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FlattenFileMapper"/>
+                                    </fileMappers>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
     </plugins>
   </build>
   <profiles>
