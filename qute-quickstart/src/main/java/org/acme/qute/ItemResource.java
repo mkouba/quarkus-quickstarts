@@ -18,7 +18,7 @@ public class ItemResource {
 
     @CheckedTemplate
     static class Templates {
-        
+
         static native TemplateInstance items(List<Item> items);
     }
 
@@ -39,5 +39,11 @@ public class ItemResource {
     static BigDecimal discountedPrice(Item item) {
         return item.price.multiply(new BigDecimal("0.9"));
     }
+
+    // Uncomment this method to override the defatult {item.name} 
+    // @TemplateExtension(priority = 20)
+    //static String name(Item item) {
+    //    return item.name.toLowerCase();
+    //}
 
 }

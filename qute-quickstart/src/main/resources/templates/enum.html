@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Qute Enum</title> 
+</head>
+<body>
+    <ul>
+        {#for color in Color:values}
+        <li{#if color is Color:GREEN} style="color:green;"{#else if color is Color:favoriteColor} style="font-weight:bold;"{/if}>
+        {color}
+        </li>
+        {/for}
+    </ul>
+</body>
+</html>

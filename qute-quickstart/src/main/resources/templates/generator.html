@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Qute Id generator</title> 
+</head>
+<body>
+    <h1>Generated Ids</h1>
+    <ul>
+        {#for i in 5}
+        <li>{cdi:generator.newId}</li>
+        {/for}
+    </ul>
+</body>
+</html>

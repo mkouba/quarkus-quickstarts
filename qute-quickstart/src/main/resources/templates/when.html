@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Qute When</title> 
+</head>
+<body>
+    {#let val = org_acme_qute_Util:getTheRightNumber}
+    <h1>{val} is
+    {#when val}
+        {#is > 30}Good enough
+        {#is > 10}Good
+        {#else}Not good at all
+    {/when}
+    </h1>
+    {/let}
+</body>
+</html>
