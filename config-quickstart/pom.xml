@@ -58,6 +58,7 @@
             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
             <maven.home>${maven.home}</maven.home>
           </systemPropertyVariables>
+          <!--argLine>-agentpath:/opt/java/async-profiler-2.9-linux-x64/build/libasyncProfiler.so=start,event=cpu,file=test-cpu-profile.html,interval=1ms,simple</argLine-->
         </configuration>
       </plugin>
       <plugin>

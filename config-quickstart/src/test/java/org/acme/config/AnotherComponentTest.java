@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mockito;
 
-import io.quarkus.test.component.QuarkusComponentTest;
+import io.quarkus.test.component.QuarkusComponentTestExtension;
 import jakarta.inject.Inject;
 
 public class AnotherComponentTest {
 
     @RegisterExtension
-    static final QuarkusComponentTest test = new QuarkusComponentTest(MyComponent.class)
+    static final QuarkusComponentTestExtension test = new QuarkusComponentTestExtension(MyComponent.class)
             .configProperty("foo", "BAR")
             .mock(Charlie.class).create(c -> {
                 Charlie mock = Mockito.mock(Charlie.class);

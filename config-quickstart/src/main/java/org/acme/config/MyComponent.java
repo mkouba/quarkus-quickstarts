@@ -27,7 +27,7 @@ public class MyComponent {
         return charlie.pong() + " and " + foo;
     }
 
-    void onStart(@Observes Boolean payload, Delta delta) {
+    void onBoolean(@Observes Boolean payload, Delta delta) {
         delta.start();
     }
 

@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mockito;
 
-import io.quarkus.test.component.QuarkusComponentTest;
+import io.quarkus.test.component.QuarkusComponentTestExtension;
 import jakarta.inject.Inject;
 
 public class MyComponentV1Test {
 
     @RegisterExtension
-    static final QuarkusComponentTest test = new QuarkusComponentTest(MyComponent.class)
+    static final QuarkusComponentTestExtension test = new QuarkusComponentTestExtension(MyComponent.class)
             .configProperty("foo", "BAR");
 
     @Inject
@@ -23,6 +23,7 @@ public class MyComponentV1Test {
 
     @Test
     public void testPing1() {
+        System.err.println("Thread:" + Thread.currentThread().getName());
         Mockito.when(charlie.ping()).thenReturn("foo");
         assertEquals("foo and BAR", myComponent.ping());
     }
