@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    {#bundle /}
+    <title>Creatures</title>
+</head>
+
+<body>
+
+    {#if creatures.empty}
+    <form action="/creatures" method="POST">
+        <button type="submit">Create</button>
+    </form>
+    {/if}
+    <form action="/creatures/delete" method="POST">
+        <button type="submit">Delete</button>
+    </form>
+
+    <table>
+        <tr>
+            <th>#</th>
+            <th>NAME</th>
+            <th>POWERS</th>
+        </tr>
+        {#for creature in creatures}
+        <tr>
+            <td>{creature_index}</td>
+            <td>{creature.name}</td>
+            <td>[{#each creature.powers}{it.name}{#if it_hasNext},{/if}{/each}]</td>
+        </tr>
+        {/for}
+    </table>
+
+</body>
+
+</html>
