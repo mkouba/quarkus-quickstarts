@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.reactive.mutiny.Mutiny.SessionFactory;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
@@ -23,6 +24,9 @@ public class CreatureResource {
 
     @Inject
     UriInfo uriInfo;
+
+    @Inject
+    SessionFactory sessionFactory;
 
     record list(List<Creature> creatures) implements TemplateInstance {
     }
@@ -45,7 +49,7 @@ public class CreatureResource {
         return CreaturePower.deleteAll().chain(c -> Creature.deleteAll().replaceWith(RestResponse.seeOther(listUri)));
     }
 
-    @WithTransaction
+    //@WithTransaction
     @POST
     @Produces(MediaType.TEXT_HTML)
     public Uni<RestResponse<Object>> create() {
@@ -58,7 +62,10 @@ public class CreatureResource {
             creatures.add(c);
         }
         Log.infof("Going to create %s creatures", creatures.size());
-        return Creature.persist(creatures).replaceWith(RestResponse.seeOther(listUri));
+        return sessionFactory.withTransaction((s, t) -> {
+            return s.persistAll(creatures.toArray());
+        }).replaceWith(RestResponse.seeOther(listUri));
+        // return Creature.persist(creatures).replaceWith(RestResponse.seeOther(listUri));
     }
 
 }
